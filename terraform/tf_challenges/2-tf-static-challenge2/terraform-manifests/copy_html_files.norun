@@ -1,0 +1,18 @@
+
+resource "null_resource" "null_copy_ssh_key_to_bastion" {
+  depends_on = [azurerm_storage_account_static_website.name]
+  # Connection Block for Provisioners to connect to Azure VM Instance
+  ## File Provisioner: Copies the terraform-key.pem file to /tmp/terraform-key.pem
+  provisioner "file" {
+    source      = "ssh-keys/tf_web_server.pem"
+    destination = "/tmp/tf_web_server.pem"
+  }
+  ## Remote Exec Provisioner: Using remote-exec provisioner fix the private key permissions on Bastion Host
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod 400 /tmp/tf-web-server.pem"
+    ]
+  }
+}
+
+
